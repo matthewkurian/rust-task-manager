@@ -6,7 +6,15 @@ use std::path::Path;
 struct Item {
     id: i32,
     desc: String,
-    done: bool
+    done: Progress,
+}
+
+#[derive(serde::Serialize)]
+#[derive(serde::Deserialize)]
+enum Progress {
+    Added,
+    Doing,
+    Done
 }
 
 fn file_to_vec() -> Vec<Item> {
@@ -29,7 +37,7 @@ fn vec_to_file(list: Vec<Item>, count: i32) {
 fn save_task(task: String) {
     let mut list: Vec<Item> = file_to_vec();
     let count: i32 = (list.len() as i32) + 1;
-    let task_item = Item{id: count, desc: task, done: false};
+    let task_item = Item{id: count, desc: task, done: Progress::Added};
     list.push(task_item);
     vec_to_file(list, count);
 }
@@ -37,10 +45,16 @@ fn save_task(task: String) {
 fn list_items() {
     println!("========[ RUST TODO LIST ]========\n");
     let list: Vec<Item> = file_to_vec();
-    let count: i32 = (list.len() as i32) + 1;
+    let count: i32 = (list.len() as i32);
     let mut count_done: i32 = 0;
     for item in &list {
-        println!("{}. {}: {}", item.id, item.desc, if item.done {count_done+=1; "✔"} else {"✘"})
+        let icon: &str;
+        match item.done {
+            Progress::Added => {icon = "+"},
+            Progress::Doing => {icon = "-"},
+            Progress::Done => {count_done+= 1; icon = "✔"},
+        }
+        println!("{}. {}: {}", item.id, item.desc, icon)
     }
     println!("\n{}/{} Tasks Complete \n========[ RUST TODO LIST ]========", count_done, count);
 }
