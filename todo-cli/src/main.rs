@@ -1,6 +1,4 @@
-use serde::{Serialize, Deserialize};
 use std::fs;
-use std::io::prelude::*;
 use std::path::Path;
 
 #[derive(serde::Serialize)]
@@ -40,12 +38,10 @@ fn main() {
     let args: Vec<String> = std::env::args().collect();
     let option: &String = &args[1];
     let item: String = args[2].clone();
-
-    if option.to_lowercase() == "add" {
-        save_task(item);
-    } else if option.to_lowercase() == "list" {
-        println!("List Triggered")
-    } else {
-        eprintln!("Invalid option. Use 'add' or 'list'")
+    
+    match option.to_lowercase().as_str() {
+        "add" => { save_task(item) }
+        "list" => { println!("ok") }
+        _ => { eprint!("Invalid option. Use 'add' or 'list'") }
     }
 }
