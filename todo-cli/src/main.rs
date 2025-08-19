@@ -1,13 +1,29 @@
 use serde::{Serialize, Deserialize};
-#[derive(serde::Serialize)]
+use std::fs;
+use std::io::prelude::*;
+use std::path::Path;
 
+#[derive(serde::Serialize)]
+#[derive(serde::Deserialize)]
 struct Item {
     id: i32,
     desc: String,
     done: bool
 }
 
+fn file_to_vec() -> Vec<Item> {
+    if !Path::new("tasks.json").exists() {
+        return Vec::new();
+    }
+
+    let data = fs::read_to_string("tasks.json").unwrap();
+    let list: Vec<Item> = serde_json::from_str(&data)
+    .expect("JSON was not well-formatted");
+    list
+}
+
 fn save_task(task: Item) {
+    let list: Vec<Item> = file_to_vec();
     let json = serde_json::to_string_pretty(&task).unwrap();
     println!("New Task Added \n{}", json)
 }
@@ -24,5 +40,4 @@ fn main() {
     } else {
         eprintln!("Invalid option. Use 'add' or 'list'")
     }
-
 }
