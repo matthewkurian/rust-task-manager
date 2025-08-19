@@ -6,6 +6,16 @@ struct Item {
 }
 
 fn main() {
-    let task1 = Item{id: 1, desc: "Pick up food".to_string(), done: false};
-    println!("{}", task1.desc);
+    let args: Vec<String> = std::env::args().collect();
+    let option: &String = &args[1];
+    let item: &String = &args[2];
+
+    if option.to_lowercase() == "add" {
+        println!("Add Triggered: {}", item)
+    } else if option.to_lowercase() == "list" {
+        println!("List Triggered")
+    } else {
+        eprintln!("Invalid option. Use 'add' or 'list'")
+    }
+
 }
