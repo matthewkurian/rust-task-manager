@@ -22,16 +22,17 @@ fn file_to_vec() -> Vec<Item> {
     list
 }
 
-fn save_task(task: Item) {
-    let list: Vec<Item> = file_to_vec();
-    let json = serde_json::to_string_pretty(&task).unwrap();
-    println!("New Task Added \n{}", json)
+fn save_task(task: String) {
+    let mut list: Vec<Item> = file_to_vec();
+    let task_item = Item{id: (list.len() as i32) + 1, desc: task, done: false};
+    list.push(task_item);
+    
 }
 
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let option: &String = &args[1];
-    let item = Item{id: 1, desc: args[2].clone(), done: false};
+    let item: String = args[2].clone();
 
     if option.to_lowercase() == "add" {
         save_task(item);
