@@ -60,15 +60,15 @@ fn list_items() {
     println!("\n{}/{} Tasks Complete \n========[ RUST TODO LIST ]========", count_done, count);
 }
 
-fn set_complete(task: String, inProgress: bool) {
-    let mut index: i32 = 0;
+fn set_complete(task: String, in_progress: bool) {
+    let index: i32;
     match task.parse::<i32>() {
         Ok(num) => {index = num;}
         Err(e) => {println!("Error! Please enter a valid index number: {}", e); return}
     }
     let mut list: Vec<Item> = file_to_vec();
     if let Some(v) = list.get_mut(index as usize) {
-        match inProgress {
+        match in_progress {
         false => {
             v.done = Progress::Done;
             println!("Task '{}' has been Completed.", v.desc);
