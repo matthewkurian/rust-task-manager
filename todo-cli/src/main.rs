@@ -1,3 +1,5 @@
+#![allow(unused_parens)]
+
 use std::fs;
 use std::path::Path;
 
