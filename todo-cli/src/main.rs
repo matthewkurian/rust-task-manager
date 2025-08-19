@@ -22,11 +22,18 @@ fn file_to_vec() -> Vec<Item> {
     list
 }
 
+fn vec_to_file(list: Vec<Item>, count: i32) {
+    let data  = serde_json::to_string_pretty(&list).unwrap();
+    fs::write("tasks.json", data).unwrap();
+    println!("Task List Updated.\n{} Tasks in List", count)
+}
+
 fn save_task(task: String) {
     let mut list: Vec<Item> = file_to_vec();
-    let task_item = Item{id: (list.len() as i32) + 1, desc: task, done: false};
+    let count: i32 = (list.len() as i32) + 1;
+    let task_item = Item{id: count, desc: task, done: false};
     list.push(task_item);
-    
+    vec_to_file(list, count);
 }
 
 fn main() {
