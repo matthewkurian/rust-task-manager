@@ -34,14 +34,27 @@ fn save_task(task: String) {
     vec_to_file(list, count);
 }
 
+fn list_items() {
+    println!("========[ RUST TODO LIST ]========\n");
+    let list: Vec<Item> = file_to_vec();
+    let count: i32 = (list.len() as i32) + 1;
+    let mut count_done: i32 = 0;
+    for item in &list {
+        println!("{}. {}: {}", item.id, item.desc, if item.done {count_done+=1; "✔"} else {"✘"})
+    }
+    println!("\n{}/{} Tasks Complete \n========[ RUST TODO LIST ]========", count_done, count);
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let option: &String = &args[1];
-    let item: String = args[2].clone();
-    
+
     match option.to_lowercase().as_str() {
-        "add" => { save_task(item) }
-        "list" => { println!("ok") }
+        "add" => { 
+            let item: String = args[2].clone(); 
+            save_task(item) 
+        }
+        "list" => { list_items() }
         _ => { eprint!("Invalid option. Use 'add' or 'list'") }
     }
 }
