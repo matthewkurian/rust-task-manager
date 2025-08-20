@@ -1,5 +1,7 @@
 #![allow(unused_parens)]
 
+use core::task;
+
 use crate::models::Item;
 use crate::models::Progress;
 use crate::storage::file_to_vec;
@@ -9,20 +11,17 @@ mod models;
 mod storage;
 
 
-fn save_task(task: String) {
-    let mut list: Vec<Item> = file_to_vec();
-    let count: i32 = (list.len() as i32) + 1;
+fn save_task(task: String, task_list: &mut Vec<Item>) {
+    let count: i32 = (task_list.len() as i32) + 1;
     let task_item = Item{id: count, desc: task, done: Progress::Added};
-    list.push(task_item);
-    vec_to_file(list);
+    task_list.push(task_item);
 }
 
-fn list_items() {
+fn list_items(task_list: &Vec<Item>) {
     println!("========[ RUST TODO LIST ]========\n");
-    let list: Vec<Item> = file_to_vec();
-    let count: i32 = (list.len() as i32);
+    let count: i32 = (task_list.len() as i32);
     let mut count_done: i32 = 0;
-    for item in &list {
+    for item in task_list {
         let icon: &str;
         match item.done {
             Progress::Added => {icon = "+"},
@@ -34,14 +33,13 @@ fn list_items() {
     println!("\n{}/{} Tasks Complete \n========[ RUST TODO LIST ]========", count_done, count);
 }
 
-fn set_complete(task: String, in_progress: bool) {
+fn set_complete(task: String, in_progress: bool, task_list: &mut Vec<Item>) {
     let index: i32;
     match task.parse::<i32>() {
         Ok(num) => {index = num-1;}
         Err(e) => {println!("Error! Please enter a valid index number: {}", e); return}
     }
-    let mut list: Vec<Item> = file_to_vec();
-    if let Some(v) = list.get_mut(index as usize) {
+    if let Some(v) = task_list.get_mut(index as usize) {
         match in_progress {
         false => {
             v.done = Progress::Done;
@@ -52,7 +50,6 @@ fn set_complete(task: String, in_progress: bool) {
             println!("Task '{}' is in Progress.", v.desc);
         }
         }
-        vec_to_file(list);
         return;
     }
 
@@ -63,15 +60,23 @@ fn set_complete(task: String, in_progress: bool) {
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let option: &String = &args[1];
+    let mut task_list: Vec<Item>;
+
+    // Get Task List
+    task_list = file_to_vec();
 
     match option.to_lowercase().as_str() {
         "add" => { 
             let item: String = args[2].clone(); 
-            save_task(item) 
+            save_task(item, &mut task_list) 
         }
-        "list" => { list_items() }
-        "done" => { let task: String = args[2].clone(); set_complete(task, false) }
-        "doing" => { let task: String = args[2].clone(); set_complete(task, true) }
+        "list" => { list_items(&task_list) }
+        "done" => { let task: String = args[2].clone(); set_complete(task, false, &mut task_list) }
+        "doing" => { let task: String = args[2].clone(); set_complete(task, true, &mut task_list) }
         _ => { eprint!("Invalid option. Use 'add' or 'list'") }
     }
+
+    // Save Vec to file
+    vec_to_file(task_list);
+
 }
