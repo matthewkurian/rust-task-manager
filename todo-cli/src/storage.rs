@@ -1,20 +1,21 @@
 use std::fs;
 use std::path::Path;
+use anyhow::Result;
 
 use crate::models::Item;
 
-pub fn file_to_vec() -> Vec<Item> {
+pub fn file_to_vec() -> Result<Vec<Item>> {
     if !Path::new("tasks.json").exists() {
-        return Vec::new();
+        return Ok(Vec::new());
     }
 
-    let data = fs::read_to_string("tasks.json").unwrap();
-    let list: Vec<Item> = serde_json::from_str(&data)
-    .expect("JSON was not well-formatted");
-    list
+    let data = fs::read_to_string("tasks.json")?;
+    let list: Vec<Item> = serde_json::from_str(&data)?;
+    Ok(list)
 }
 
-pub fn vec_to_file(list: Vec<Item>) {
-    let data  = serde_json::to_string_pretty(&list).unwrap();
-    fs::write("tasks.json", data).unwrap();
+pub fn vec_to_file(list: Vec<Item>) -> Result<()> {
+    let data  = serde_json::to_string_pretty(&list)?;
+    fs::write("tasks.json", data)?;
+    Ok(())
 }

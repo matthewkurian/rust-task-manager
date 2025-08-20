@@ -63,7 +63,10 @@ fn main() {
     let mut task_list: Vec<Item>;
 
     // Get Task List
-    task_list = file_to_vec();
+    match file_to_vec() {
+        Ok(v) => {task_list = v},
+        Err(e) => {println!("⚠️ Could not load tasks: {}", e); return}
+    }
 
     match option.to_lowercase().as_str() {
         "add" => { 
@@ -77,6 +80,9 @@ fn main() {
     }
 
     // Save Vec to file
-    vec_to_file(task_list);
+    match vec_to_file(task_list) {
+        Ok(()) => {},
+        Err(e) => {println!("⚠️ Could not save tasks: {}", e)}
+    }
 
 }
