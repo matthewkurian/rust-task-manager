@@ -3,21 +3,11 @@
 use std::fs;
 use std::path::Path;
 
-#[derive(serde::Serialize)]
-#[derive(serde::Deserialize)]
-struct Item {
-    id: i32,
-    desc: String,
-    done: Progress,
-}
+mod models;
+mod storage;
 
-#[derive(serde::Serialize)]
-#[derive(serde::Deserialize)]
-enum Progress {
-    Added,
-    Doing,
-    Done
-}
+use crate::models::Item;
+use crate::models::Progress;
 
 fn file_to_vec() -> Vec<Item> {
     if !Path::new("tasks.json").exists() {
