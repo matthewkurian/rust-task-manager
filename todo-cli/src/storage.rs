@@ -15,8 +15,6 @@ pub fn file_to_vec() -> Vec<Item> {
 }
 
 pub fn vec_to_file(list: Vec<Item>) {
-    let count: i32 = (list.len() as i32);
     let data  = serde_json::to_string_pretty(&list).unwrap();
     fs::write("tasks.json", data).unwrap();
-    println!("Task List Updated.\n{} Tasks in List", count)
 }
