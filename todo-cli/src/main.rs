@@ -65,7 +65,7 @@ fn list_items() {
 fn set_complete(task: String, in_progress: bool) {
     let index: i32;
     match task.parse::<i32>() {
-        Ok(num) => {index = num;}
+        Ok(num) => {index = num-1;}
         Err(e) => {println!("Error! Please enter a valid index number: {}", e); return}
     }
     let mut list: Vec<Item> = file_to_vec();
