@@ -1,14 +1,39 @@
 #![allow(unused_parens)]
 
-use core::task;
-
 use crate::models::Item;
 use crate::models::Progress;
 use crate::storage::file_to_vec;
 use crate::storage::vec_to_file;
+use clap::{Parser, Subcommand};
 
 mod models;
 mod storage;
+
+#[derive(Parser)]
+#[command(name = "todo-cli")]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+
+    /// List items in the task list
+    List {},
+
+    /// Add item to task list
+    Add {
+        item: String
+    },
+
+    Done {
+        id: i32,
+
+        #[arg(short, long)]
+        doing: bool
+    }
+}
 
 
 fn save_task(task: String, task_list: &mut Vec<Item>) {
@@ -33,12 +58,8 @@ fn list_items(task_list: &Vec<Item>) {
     println!("\n{}/{} Tasks Complete \n========[ RUST TODO LIST ]========", count_done, count);
 }
 
-fn set_complete(task: String, in_progress: bool, task_list: &mut Vec<Item>) {
-    let index: i32;
-    match task.parse::<i32>() {
-        Ok(num) => {index = num-1;}
-        Err(e) => {println!("Error! Please enter a valid index number: {}", e); return}
-    }
+fn set_complete(task: i32, in_progress: bool, task_list: &mut Vec<Item>) {
+    let index: i32 = task - 1;
     if let Some(v) = task_list.get_mut(index as usize) {
         match in_progress {
         false => {
@@ -58,8 +79,6 @@ fn set_complete(task: String, in_progress: bool, task_list: &mut Vec<Item>) {
 }
 
 fn main() {
-    let args: Vec<String> = std::env::args().collect();
-    let option: &String = &args[1];
     let mut task_list: Vec<Item>;
 
     // Get Task List
@@ -68,15 +87,18 @@ fn main() {
         Err(e) => {println!("⚠️ Could not load tasks: {}", e); return}
     }
 
-    match option.to_lowercase().as_str() {
-        "add" => { 
-            let item: String = args[2].clone(); 
-            save_task(item, &mut task_list) 
+    let cli = Cli::parse();
+
+    match cli.command {
+        Commands::List {} => {
+            list_items(&task_list)
         }
-        "list" => { list_items(&task_list) }
-        "done" => { let task: String = args[2].clone(); set_complete(task, false, &mut task_list) }
-        "doing" => { let task: String = args[2].clone(); set_complete(task, true, &mut task_list) }
-        _ => { eprint!("Invalid option. Use 'add' or 'list'") }
+        Commands::Add { item } => {
+            save_task(item, &mut task_list);
+        }
+        Commands::Done { id, doing } => {
+            set_complete(id, doing, &mut task_list);
+        }
     }
 
     // Save Vec to file
